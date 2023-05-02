@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 jupyterlab = "*"
 tqdm = "*"
+pandas = "*"
 
 [dev-packages]
 
