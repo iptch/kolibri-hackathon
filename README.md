@@ -26,7 +26,7 @@ pipenv shell
 ### Getting started
 #### Getting the data ready
 - Copy the file `content.csv` which you downloaded from the [kaggle competition website](https://www.kaggle.com/competitions/learning-equality-curriculum-recommendations/data)
-  into the folder `data`. That means you end up with a file called `content.csv` inside the `data` folder at the root of this repo.
+  into the folder `data`. That means you end up with a file called `content.csv` inside the `data` folder at the root of this repo. Note: You can also get it from the ipt oss4good GDrive when you don't have a Kaggle account and don't want to register.
 - Note: `data/content.csv` will be ignored by git and not checked in into the repo.
 
 #### Running the notebooks
