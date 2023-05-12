@@ -1,10 +1,14 @@
+import numpy as np
 import pandas as pd
 
 from common import DATA_DIR_PATH
 
 
 def auto_truncate(val):
-    return val[:511]
+    if val == "":
+        return np.nan
+    else:
+        return val[:511]
 
 
 def load_content_file(path=DATA_DIR_PATH / 'content.csv', truncate=False) -> pd.DataFrame:

@@ -34,14 +34,13 @@ def encoder(texts, modelname):
 
 
 if __name__ == "__main__":
-
     df = load_content_file(truncate=True)
     df.describe()
 
     description_ = df['description']
-    non_nan_descriptions = description_.dropna(ignore_index=True)
+    non_nan_descriptions = description_.dropna().reset_index(drop=True)
 
-    non_nan_descriptions = non_nan_descriptions[0:10]
+    non_nan_descriptions = non_nan_descriptions[0:1000]
     all_input_embeddings = encoder(non_nan_descriptions, "bert-base-uncased")
 
     df_i = pd.DataFrame(all_input_embeddings)
