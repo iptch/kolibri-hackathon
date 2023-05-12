@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import pipeline
 
+from common import model
 from kolihack.io import load_content_file
 
 
@@ -37,11 +38,11 @@ if __name__ == "__main__":
     df = load_content_file(truncate=True)
     df.describe()
 
-    description_ = df['description']
+    description_ = df.query("language == 'en'")['description']
     non_nan_descriptions = description_.dropna().reset_index(drop=True)
 
     non_nan_descriptions = non_nan_descriptions[0:1000]
-    all_input_embeddings = encoder(non_nan_descriptions, "bert-base-uncased")
+    all_input_embeddings = encoder(non_nan_descriptions, model)
 
     df_i = pd.DataFrame(all_input_embeddings)
     df_i.to_pickle('input_embeddings.pkl')
