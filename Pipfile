@@ -7,6 +7,10 @@ name = "pypi"
 jupyterlab = "*"
 tqdm = "*"
 pandas = "*"
+transformers = "*"
+torch = "*"
+tensorflow = "*"
+scikit-learn = "*"
 
 [dev-packages]
 
