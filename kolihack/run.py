@@ -41,7 +41,6 @@ if __name__ == "__main__":
     description_ = df.query("language == 'en'")['description']
     non_nan_descriptions = description_.dropna().reset_index(drop=True)
 
-    non_nan_descriptions = non_nan_descriptions[0:1000]
     all_input_embeddings = encoder(non_nan_descriptions, model)
 
     df_i = pd.DataFrame(all_input_embeddings)
