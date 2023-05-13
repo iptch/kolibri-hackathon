@@ -11,10 +11,10 @@ def auto_truncate(val):
         return val[:511]
 
 
-def load_content_file(path=DATA_DIR_PATH / 'content.csv', truncate=False) -> pd.DataFrame:
+def load_content_file(path=DATA_DIR_PATH / 'mit_content_lang.csv', truncate=False) -> pd.DataFrame:
     try:
         if truncate:
-            df = pd.read_csv(path, converters={'description': auto_truncate})
+            df = pd.read_csv(path, sep=";", converters={'description': auto_truncate})
         else:
             df = pd.read_csv(path)
         print(f'Successfully loaded pandas data frame from {path}/content.csv')
