@@ -7,9 +7,12 @@ name = "pypi"
 jupyterlab = "*"
 tqdm = "*"
 pandas = "*"
+sentence-transformers = "*"
+torch = "*"
+torchvision = "*"
+importlib-metadata = "*"
+faiss-cpu = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
-python_full_version = "3.10.6"
