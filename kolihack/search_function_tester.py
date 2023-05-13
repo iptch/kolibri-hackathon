@@ -2,7 +2,19 @@ import numpy as np
 import time
 from kolihack.io import load_pkl_from_file
 from kolihack.bert_search import BertSearch
+from functools import wraps
+from time import time
 
+def timeit(f):
+    @wraps(f)
+    def wrap(*args, **kw):
+        ts = time()
+        result = f(*args, **kw)
+        te = time()
+        print('func:%r args:[%r, %r] took: %2.4f sec' % \
+          (f.__name__, args, kw, te-ts))
+        return result
+    return wrap
 
 class SearchResults:
     def __init__(self, search_results, execution_time, cpu_time, memory_usage):
@@ -12,32 +24,31 @@ class SearchResults:
         self.memory_usage = memory_usage
 
 
-def test_search(query, search_object, descriptions):
-    exex_time_start = time.time()
-    cpu_time_start = time.process_time()
-    indexes_highest_ranking = search_object.search(query)
-    results = descriptions['description'][np.squeeze(indexes_highest_ranking)]
-    exex_time_end = time.time()
-    cpu_time_end = time.process_time()
-    search_result = SearchResults(results, exex_time_end-exex_time_start, cpu_time_end-cpu_time_start,0 )
-    print(search_result.search_results)
-    print(f'Execution Time {search_result.execution_time} \n CpuTime {search_result.execution_time} \n ')
+@timeit
+def test_search(query, search_object):
+    results = search_object.search(query)
+    search_result = SearchResults(results, 2, 3,0 )
+    for _, row in results.iterrows():
+        print(f"{row['id']:25}: {row['title']}")
 
 
 
 def load_embeddings():
-    return load_pkl_from_file("input_embeddings.pkl"), load_pkl_from_file("non_nan_descriptions.pkl")
+    return load_pkl_from_file("embeddings_by_id.pkl").transpose(), load_pkl_from_file("input_id_and_text.pkl")
 
 
 if __name__ == "__main__":
-    embeddings, non_nan_descriptions = load_embeddings()
-    bert_search = BertSearch(embeddings)
+    embeddings_ids, ids_text = load_embeddings()
+    bert_search = BertSearch(embeddings_ids, ids_text)
+    bert_basic_search = BertSearch(embeddings_ids, ids_text,  "bert-base-uncased")
+    #bert_MIniLM_search = BertSearch(embeddings, "sentence-transformers/all-MiniLM-L6-v2")
     while True:
         print("Dear kolibiri user - what are you looking for?")
         query = input()
         if query == 'exit': break
 
-        st = time.time()
-        search_result = test_search(query, bert_search, non_nan_descriptions)
-        ed = time.time()
-        print(f'time: {ed-st}')
+        search_result = test_search(query, bert_search)
+        search_result = test_search(query, bert_basic_search)
+        #search_result = test_search(query, bert_MIniLM_search, non_nan_descriptions)
+
+

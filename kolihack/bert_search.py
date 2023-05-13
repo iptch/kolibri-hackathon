@@ -5,8 +5,9 @@ from tqdm import tqdm
 from transformers import pipeline
 
 class BertSearch:
-    def __init__(self, embeddings, model="sentence-transformers/all-mpnet-base-v2"):
+    def __init__(self, embeddings, ids_text, model="sentence-transformers/all-mpnet-base-v2"):
         self. embeddings = embeddings
+        self.ids_text = ids_text
         self.model = model
         self.pipe = pipeline("feature-extraction", model=self.model, okenizer=self.model)
 
@@ -35,4 +36,6 @@ class BertSearch:
     def search(self, query):
         query_embedding = self.encoder([query])
         similarities_bert = cosine_similarity(self.embeddings, query_embedding)
-        return np.argsort(similarities_bert, axis=0)[::-1][:10]
+
+        index_of_highest_scores = np.argsort(similarities_bert, axis=0)[::-1][:5]
+        return self.ids_text.iloc[list(np.squeeze(index_of_highest_scores))]
