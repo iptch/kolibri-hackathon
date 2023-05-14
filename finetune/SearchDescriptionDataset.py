@@ -2,8 +2,28 @@ from torch.utils.data import Dataset, DataLoader
 from transformers import BertTokenizer
 from utils import generate_samples
 
+def init_dataloader(batch_size = 1):
+    # Instantiate the dataset and dataloader
+    csvfiles = ['English_1.csv','English_2.csv', 'English_3.csv', 'English_4.csv', 'English_5.csv', 'English_6.csv']
+    for i in range(len(csvfiles)):
+        csvfiles[i]= 'generateDataFromChatGPT/' + csvfiles[i]
+    print(csvfiles)
+
+    search_terms, content = generate_samples(csvfiles)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+    dataset = SearchDescriptionDataset(search_terms, content, tokenizer)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+    dataset_size = len(dataset)
+    batch_size = dataloader.batch_size
+    num_batches = dataset_size // batch_size
+    print('\n\n\n\ndataset size', dataset_size, 'batch size', batch_size, 'number of batches', num_batches)
+    return dataloader
+
 class SearchDescriptionDataset(Dataset):
-    def __init__(self, seacrh_terms, descriptions, tokenizer, max_length=128):
+    def __init__(self, search_terms, descriptions, tokenizer, max_length=128):
+        assert(len(search_terms) == len(descriptions))
         self.search_terms = search_terms
         self.descriptions = descriptions
         self.tokenizer = tokenizer
@@ -59,10 +79,10 @@ if __name__ == "__main__":
     num_batches = dataset_size // batch_size
 
     for bi, batch in enumerate(dataloader):
-        search_term_embedding, content_embedding = batch
+        search_term_token, content_token = batch
         if bi == 5:
-            print('search term embedding', search_term_embedding)
-            print('content embedding', content_embedding)
+            print('search term token', search_term_token)
+            print('content token', content_token) 
 
     
     print('\n\n\n\ndataset size', dataset_size, 'batch size', batch_size, 'number of batches', num_batches)

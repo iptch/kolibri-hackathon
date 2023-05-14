@@ -8,5 +8,5 @@ class BertEmbedding(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         # We only need the outputs from the BERT model, not the pooled outputs
-        bert_output = self.bert(input_ids=input_ids, attention_mask=attention_mask)[0]  
+        bert_output = self.bert(input_ids=input_ids, attention_mask=attention_mask)[0]
         return bert_output
