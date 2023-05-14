@@ -12,6 +12,11 @@ torch = "*"
 tensorflow = "*"
 scikit-learn = "*"
 argparse = "*"
+numpy = "*"
+sentence-transformers = "*"
+torchvision = "*"
+importlib-metadata = "*"
+faiss-cpu = "*"
 
 [dev-packages]
 

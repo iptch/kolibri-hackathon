@@ -1,54 +1,114 @@
-import numpy as np
+import faiss
+import pandas as pd
 import time
+
+from kolihack.faiss_search import FaissSearch
 from kolihack.io import load_pkl_from_file
 from kolihack.bert_search import BertSearch
 from functools import wraps
-from time import time
+import tracemalloc
+#
+# def timeit(f):
+#     @wraps(f)
+#     def wrap(*args, **kw):
+#         ts = time.time()
+#         result = f(*args, **kw)
+#         te = time.time()
+#         print('func:%r args:[%r, %r] took: %2.4f sec' % \
+#           (f.__name__, args, kw, te-ts))
+#         return result
+#     return wrap
 
-def timeit(f):
-    @wraps(f)
-    def wrap(*args, **kw):
-        ts = time()
-        result = f(*args, **kw)
-        te = time()
-        print('func:%r args:[%r, %r] took: %2.4f sec' % \
-          (f.__name__, args, kw, te-ts))
-        return result
-    return wrap
 
 class SearchResults:
-    def __init__(self, search_results, execution_time, cpu_time, memory_usage):
-        self.search_results = search_results
-        self.execution_time = execution_time
-        self.cpu_time = cpu_time
-        self.memory_usage = memory_usage
+    def __init__(self, query,  search_results, execution_time, cpu_time, memory_usage):
+        self._query = query
+        self._search_results = search_results
+        self._execution_time = execution_time
+        self._cpu_time = cpu_time
+        self._memory_usage = memory_usage
+
+    @property
+    def query(self):
+        return self._query
+
+    @property
+    def search_results(self):
+        return self._search_results
+
+    @property
+    def execution_time(self):
+        return self._execution_time
+
+    @property
+    def cpu_time(self):
+        return self._cpu_time
+
+    @property
+    def memory_usage(self):
+        return self._memory_usage
 
 
-@timeit
 def test_search(query, search_object):
+    tracemalloc.start()
+    t_st = time.time()
+    t_p_st = time.process_time()
     results = search_object.search(query)
-    search_result = SearchResults(results, 2, 3,0 )
-    for _, row in results.iterrows():
-        print(f"{row['id']:25}: {row['title']}")
-
+    memory_usage = tracemalloc.get_traced_memory()
+    t_end = time.time()
+    t_p_end = time.process_time()
+    tracemalloc.stop()
+    search_result = SearchResults(query, results, t_end-t_st, t_p_end-t_p_st, memory_usage[1])
+    try:
+        for _, row in results.iterrows():
+            print(f"{row['id']:25}: {row['title']}")
+    except:
+        print(results)
+        for id in results:
+            try: print(ids_text.loc[ids_text['id'] == id]['title'].values[0])
+            except:
+                print(id)
+    return search_result
 
 
 def load_embeddings():
     return load_pkl_from_file("embeddings_by_id.pkl").transpose(), load_pkl_from_file("input_id_and_text.pkl")
 
+def load_faiss_index():
+    return faiss.read_index("faiss_index.bin")
+
+def process_queries(queries, search_object):
+    specs = []
+    for query in queries:
+        specs.append(test_search(query, search_object))
+    plane_pd = pd.DataFrame([[result.query, result.search_results['title'].values[0],
+                              result.search_results['title'].values[1], result.search_results['title'].values[2],
+                              result.execution_time, result.cpu_time, result.memory_usage] for result in specs],
+                            columns=['Query', 'Result1', 'Result2', 'Result3', 'exec_time', 'cpu_time', 'memory_usage'])
+    print(plane_pd)
+    plane_pd.to_pickle('bert_results.pkl')
+
 
 if __name__ == "__main__":
     embeddings_ids, ids_text = load_embeddings()
+    #faiss_index = load_faiss_index()
     bert_search = BertSearch(embeddings_ids, ids_text)
-    bert_basic_search = BertSearch(embeddings_ids, ids_text,  "bert-base-uncased")
+    #bert_basic_search = BertSearch(embeddings_ids, ids_text,  "bert-base-uncased")
+    # = FaissSearch(embeddings_ids, faiss_index)
     #bert_MIniLM_search = BertSearch(embeddings, "sentence-transformers/all-MiniLM-L6-v2")
-    while True:
+    queries = ['bird', 'i want to learn something about biology', 'what is pythagoras',
+               'find the value y dependent on x', 'moon and the sun', 'how to grow crops', 'fish', 'healthy food',
+               'when to plant seeds']
+    process_queries(queries, bert_search)
+
+"""    while True:
         print("Dear kolibiri user - what are you looking for?")
         query = input()
         if query == 'exit': break
 
         search_result = test_search(query, bert_search)
-        search_result = test_search(query, bert_basic_search)
-        #search_result = test_search(query, bert_MIniLM_search, non_nan_descriptions)
+        #search_result = test_search(query, bert_basic_search)
+        search_restul = test_search(query, faiss_search)
+        #search_result = test_search(query, bert_MIniLM_search, non_nan_descriptions)"""
 
 
