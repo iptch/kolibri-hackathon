@@ -22,12 +22,12 @@ def generate_title_description_searchterms_category(prompt):
 def generate_course_data(language, number):
     course_data = []
     for _ in range(number):
-        prompt=f"Prompt:\nGenerate a title, a description, a category, 5 correctly spelled search terms, and 5 misspelled search terms in {language} for an online video using the following format:\n\nTitle: [Generate a title for the online course video]\nDescription: [Generate a description for the online course video]\nCategory: [Generate a category for the online course video, category must write in lowercase letters, must do not contain leading or trailing empty space, must be a single category. Also, the category must be one of these: mathematics, language, chemistry, biology, algorithms, deep learning, computer vision, programming languages, software architecture, frontend development, backend development.]\nCorrectly spelled search terms: [Generate 5 possible correctly spelled serach terms, seperate them using comma]\nMisspelled search terms: [Generate 5 possible misspelled serach terms, seperate them using comma]"
+        prompt=f"Prompt:\nGenerate a title, a description, a category, 5 correctly spelled search terms, 5 misspelled search terms, 5 wrong search terms in {language} for an online video using the following format:\n\nTitle: [Generate a title for the online course video]\nDescription: [Generate a description for the online course video]\nCategory: [Generate a category for the online course video, category must write in lowercase letters, must do not contain leading or trailing empty space, must be a single category. Also, the category must be one of these: mathematics, language, chemistry, biology, algorithms, deep learning, computer vision, programming languages, software architecture, frontend development, backend development.]\nCorrectly spelled search terms: [Generate 5 possible correctly spelled serach terms, seperate them using comma]\nMisspelled search terms: [Generate 5 possible misspelled serach terms, seperate them using comma]\nWrong search terms: [Generate 5 wrong search terms, seperate them using comma]"
         response = generate_title_description_searchterms_category(prompt)
         lines = split_lines_and_remove_duplicate_lines(response)
 
         # strong constraints, ignore response directly
-        if len(lines)!=5:
+        if len(lines)!=6:
            print(response)
            continue
 
@@ -42,6 +42,8 @@ def generate_course_data(language, number):
         correctly_spelled_search_terms = remove_leading_trailing_whitespace(correctly_spelled_search_terms)
         misspelled_search_terms= lines[4].split('Misspelled search terms: ')[-1]
         misspelled_search_terms = remove_leading_trailing_whitespace(misspelled_search_terms)
+        wrong_search_terms = lines[5].split('Wrong search terms: ')[-1]
+        wrong_search_terms = remove_leading_trailing_whitespace(wrong_search_terms)
 
         # strong constraints, ignore response directly
         if len(title) == 0 or len(description) == 0 or len(category) == 0:
@@ -54,13 +56,16 @@ def generate_course_data(language, number):
             print("monitoring:", correctly_spelled_search_terms)
         if len(misspelled_search_terms.split(',')) !=5:
             print("monitoring:", misspelled_search_terms)
+        if len(wrong_search_terms.split(',')) !=5:
+            print("monitoring:", wrong_search_terms)
 
         course_data.append( {
             'title': title,
             'description': description, 
             'category': category, 
             'correctlyspelled_search_terms': correctly_spelled_search_terms, 
-            'misspelled_search_terms': misspelled_search_terms
+            'misspelled_search_terms': misspelled_search_terms,
+            'wrong_search_terms': wrong_search_terms
         })
 
     assert(len(course_data) > 0)

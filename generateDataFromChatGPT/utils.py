@@ -9,7 +9,7 @@ def get_largest_index(language):
     largest_index = -1
     files = os.listdir('.')
     for file_name in files:
-        if file_name.startswith('{language}_') and file_name.endswith('.csv'):
+        if file_name.startswith(f'{language}_') and file_name.endswith('.csv'):
             try:
                 index = int(file_name.split('_')[1].split('.')[0])
                 largest_index = max(largest_index, index)
