@@ -9,6 +9,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from kolihack.bert_search import BertSearch
+from kolihack.faiss_search import FaissSearch
 from kolihack.io import load_pkl_from_file
 
 METRIC_MEMORY_USAGE = 'memory_usage'
@@ -109,11 +110,11 @@ def plot():
             METRIC_CPU_TIME: mean(data[METRIC_CPU_TIME]),
             METRIC_MEMORY_USAGE: mean(data[METRIC_MEMORY_USAGE])}
 
-        all_model_names = all_results.keys()
+    all_model_names = all_results.keys()
 
-        plot_metric(all_model_names, all_results, METRIC_CPU_TIME)
-        plot_metric(all_model_names, all_results, METRIC_EXEC_TIME)
-        plot_metric(all_model_names, all_results, METRIC_MEMORY_USAGE)
+    plot_metric(all_model_names, all_results, METRIC_CPU_TIME)
+    plot_metric(all_model_names, all_results, METRIC_EXEC_TIME)
+    plot_metric(all_model_names, all_results, METRIC_MEMORY_USAGE)
 
 
 def plot_metric(all_model_names, all_results, metric='cpu_time'):

@@ -16,6 +16,7 @@ class FaissSearch:
     def search(self, query):
         query_vector = self.model.encode([query])
         top_k = self.faiss_index.search(query_vector, self.n_results)
+        # ToDo: return correct id (the indexes of the embeddings_ids have to match the indexes of the faiss_index)
         return [self.embeddings_ids.index[_id] for _id in top_k[1]][0]
 
     def saveIndex(self):
