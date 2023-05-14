@@ -39,7 +39,3 @@ class SearchDescriptionDataset(Dataset):
         )
 
         return search_term_encoding, description_encoding
-
-# Instantiate the dataset and dataloader
-dataset = SearchDescriptionDataset(search_terms, descriptions, tokenizer)
-dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
