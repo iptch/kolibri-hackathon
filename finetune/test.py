@@ -11,3 +11,11 @@ model.eval()
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
+# Example input
+inputs = tokenizer("Hello, my dog is cute", return_tensors="pt")
+
+# Get embeddings
+with torch.no_grad():
+    embeddings = model(**inputs)
+
+print(embeddings)

@@ -4,6 +4,8 @@ from transformers import BertTokenizer
 from torch import nn
 from torch.optim import Adam
 
+device = torch.device('cpu')
+
 # Load the BERT model and tokenizer
 model = BertEmbedding()
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
