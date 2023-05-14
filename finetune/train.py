@@ -1,16 +1,20 @@
 from dataloader import SearchDescriptionDataset
-from SearchTermDescriptionModel import SearchTermDescriptionModel
+from BertEmbedding import BertEmbedding
 from transformers import BertTokenizer
 from torch import nn
 from torch.optim import Adam
 
 # Load the BERT model and tokenizer
-model = SearchTermDescriptionModel()
+model = BertEmbedding()
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Instantiate the dataset and dataloader
 dataset = SearchDescriptionDataset(search_terms, descriptions, tokenizer)
 dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
+
+dataset_size = len(dataset)
+batch_size = dataloader.batch_size
+num_batches = dataset_size // batch_size
 
 # Define the loss (Here we use CosineEmbeddingLoss which is suitable for measuring distance between embeddings)
 criterion = nn.CosineEmbeddingLoss()
