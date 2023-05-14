@@ -2,10 +2,11 @@ import os
 import openai
 from utils import *
 import argparse
+from argparse import RawTextHelpFormatter
 
 openai.api_key = os.environ.get("CHATGPT_API_KEY")
 
-def generate_title_description_searchterms_category(prompt):
+def askChatGPT(prompt):
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
@@ -23,7 +24,7 @@ def generate_course_data(language, number):
     course_data = []
     for _ in range(number):
         prompt=f"Prompt:\nGenerate a title, a description, a category, 5 correctly spelled search terms, 5 misspelled search terms, 5 wrong search terms in {language} for an online video using the following format:\n\nTitle: [Generate a title for the online course video]\nDescription: [Generate a description for the online course video]\nCategory: [Generate a category for the online course video, category must write in lowercase letters, must do not contain leading or trailing empty space, must be a single category. Also, the category must be one of these: mathematics, language, chemistry, biology, algorithms, deep learning, computer vision, programming languages, software architecture, frontend development, backend development.]\nCorrectly spelled search terms: [Generate 5 possible correctly spelled serach terms, seperate them using comma]\nMisspelled search terms: [Generate 5 possible misspelled serach terms, seperate them using comma]\nWrong search terms: [Generate 5 wrong search terms, seperate them using comma]"
-        response = generate_title_description_searchterms_category(prompt)
+        response = askChatGPT(prompt)
         lines = split_lines_and_remove_duplicate_lines(response)
 
         # strong constraints, ignore response directly
@@ -72,14 +73,20 @@ def generate_course_data(language, number):
     return course_data
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate CSV files with incremented indices. Be careful you could overwrite the file.")
+    parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter, description="Generate CSV files with incremented indices. Be careful you could overwrite the file.\n\n\
+        Example to use: python3 generateSyntheticData.py English 10\n\n\
+        With this command you are going to generate 10 content-search terms pairs, the content is title and description.\n\n\
+        The search terms include:\n\
+        1. Correct spelled search terms, you can use them to create positve samples\n\
+        2. Misspelled search terms: you can use them to create positie samples, but your model will generalize better on misspelling\n\
+        3. Wrong search terms: You can use them to create negative samples, so that your model knows better on what is not correct\n")
     parser.add_argument("language", type=str, choices=["English","Spanish","Brazilian","Portugues"], help="Possible languages: English, Spanish, Brazilian, Portugues")
     parser.add_argument("number", type=max_samples_number_per_run, help="Number of samples you want to generate,  1 - 100")
     args = parser.parse_args()
 
     selectedLanguage = capitalize_word(args.language)
-    course_data = generate_course_data(selectedLanguage, args.number)
     file_path = generate_csv_file(selectedLanguage)
+    course_data = generate_course_data(selectedLanguage, args.number)
     dump_csv(course_data, file_path)
 
 def max_samples_number_per_run(value):

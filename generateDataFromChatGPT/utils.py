@@ -11,7 +11,7 @@ def get_largest_index(language):
     for file_name in files:
         if file_name.startswith(f'{language}_') and file_name.endswith('.csv'):
             try:
-                index = int(file_name.split('_')[1].split('.')[0])
+                index = int(file_name.split('.')[0].split('_')[1])
                 largest_index = max(largest_index, index)
             except (ValueError, IndexError):
                 continue
@@ -22,6 +22,7 @@ def generate_csv_file(language):
     largest_index = get_largest_index(language)
     new_index = largest_index + 1
     file_name = f'{language}_{new_index}.csv'
+    print("New file name:", file_name, "cancel immediately, if you find I will overwrite your old files.")
     return file_name
 
 def remove_leading_trailing_whitespace(text):
