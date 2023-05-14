@@ -17,6 +17,7 @@ sentence-transformers = "*"
 torchvision = "*"
 importlib-metadata = "*"
 faiss-cpu = "*"
+matplotlib="*"
 
 [dev-packages]
 
