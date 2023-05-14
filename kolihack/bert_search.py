@@ -5,11 +5,11 @@ from tqdm import tqdm
 from transformers import pipeline
 
 class BertSearch:
-    def __init__(self, embeddings, ids_text, model="sentence-transformers/all-mpnet-base-v2"):
+    def __init__(self, embeddings, ids_text, model_name="sentence-transformers/all-mpnet-base-v2"):
         self. embeddings = embeddings
         self.ids_text = ids_text
-        self.model = model
-        self.pipe = pipeline("feature-extraction", model=self.model, okenizer=self.model)
+        self.model_name = model_name
+        self.pipe = pipeline("feature-extraction", model=self.model_name, okenizer=self.model_name)
 
 
     def normalized_mean_pooling(self, token_vectors):
