@@ -38,4 +38,4 @@ class BertSearch:
         similarities_bert = cosine_similarity(self.embeddings, query_embedding)
 
         index_of_highest_scores = np.argsort(similarities_bert, axis=0)[::-1][:5]
-        return self.ids_text.iloc[list(np.squeeze(index_of_highest_scores))]
+        return self.ids_text.loc[list(np.squeeze(index_of_highest_scores))]['id'].values

@@ -7,17 +7,6 @@ from kolihack.io import load_pkl_from_file
 from kolihack.bert_search import BertSearch
 from functools import wraps
 import tracemalloc
-#
-# def timeit(f):
-#     @wraps(f)
-#     def wrap(*args, **kw):
-#         ts = time.time()
-#         result = f(*args, **kw)
-#         te = time.time()
-#         print('func:%r args:[%r, %r] took: %2.4f sec' % \
-#           (f.__name__, args, kw, te-ts))
-#         return result
-#     return wrap
 
 
 class SearchResults:
@@ -49,7 +38,11 @@ class SearchResults:
         return self._memory_usage
 
 
-def test_search(query, search_object):
+def get_title_from_ids(ids, ids_texts):
+    return [ids_texts.loc[ids_texts['id'] == id]['title'].values[0] for id in ids]
+
+
+def test_search(query, search_object, ids_text):
     tracemalloc.start()
     t_st = time.time()
     t_p_st = time.process_time()
@@ -58,12 +51,11 @@ def test_search(query, search_object):
     t_end = time.time()
     t_p_end = time.process_time()
     tracemalloc.stop()
-    search_result = SearchResults(query, results, t_end-t_st, t_p_end-t_p_st, memory_usage[1])
+    search_result = SearchResults(query, get_title_from_ids(results, ids_text), t_end-t_st, t_p_end-t_p_st, memory_usage[1])
     try:
         for _, row in results.iterrows():
             print(f"{row['id']:25}: {row['title']}")
     except:
-        print(results)
         for id in results:
             try: print(ids_text.loc[ids_text['id'] == id]['title'].values[0])
             except:
@@ -74,19 +66,20 @@ def test_search(query, search_object):
 def load_embeddings():
     return load_pkl_from_file("embeddings_by_id.pkl").transpose(), load_pkl_from_file("input_id_and_text.pkl")
 
+
 def load_faiss_index():
     return faiss.read_index("faiss_index.bin")
 
-def process_queries(queries, search_object):
+
+def process_queries(queries, search_object, ids_text):
     specs = []
     for query in queries:
-        specs.append(test_search(query, search_object))
-    plane_pd = pd.DataFrame([[result.query, result.search_results['title'].values[0],
-                              result.search_results['title'].values[1], result.search_results['title'].values[2],
-                              result.execution_time, result.cpu_time, result.memory_usage] for result in specs],
+        specs.append(test_search(query, search_object, ids_text))
+    plane_pd = pd.DataFrame([[result.query, result.search_results[0], result.search_results[1],
+                              result.search_results[2], result.execution_time, result.cpu_time, result.memory_usage] for result in specs],
                             columns=['Query', 'Result1', 'Result2', 'Result3', 'exec_time', 'cpu_time', 'memory_usage'])
     print(plane_pd)
-    plane_pd.to_pickle('bert_results.pkl')
+    plane_pd.to_pickle('results/bert_results.pkl')
 
 
 if __name__ == "__main__":
@@ -94,12 +87,12 @@ if __name__ == "__main__":
     #faiss_index = load_faiss_index()
     bert_search = BertSearch(embeddings_ids, ids_text)
     #bert_basic_search = BertSearch(embeddings_ids, ids_text,  "bert-base-uncased")
-    # = FaissSearch(embeddings_ids, faiss_index)
+    #faiss_search = FaissSearch(embeddings_ids, faiss_index)
     #bert_MIniLM_search = BertSearch(embeddings, "sentence-transformers/all-MiniLM-L6-v2")
     queries = ['bird', 'i want to learn something about biology', 'what is pythagoras',
                'find the value y dependent on x', 'moon and the sun', 'how to grow crops', 'fish', 'healthy food',
                'when to plant seeds']
-    process_queries(queries, bert_search)
+    process_queries(queries, bert_search, ids_text)
 
 """    while True:
         print("Dear kolibiri user - what are you looking for?")
