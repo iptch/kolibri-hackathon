@@ -9,7 +9,7 @@ num_epochs = 1
 
 def train():
     
-    dataloader = init_dataloader()
+    dataloader, dataset_size, batch_size, num_batches= init_dataloader(4)
 
     # Load the BERT model and tokenizer
     model = BertEmbedding()

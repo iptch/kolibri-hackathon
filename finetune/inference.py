@@ -10,7 +10,7 @@ model.eval()
 torch.no_grad()
 
 def inference():
-    dataloader = init_dataloader(batch_size=1)
+    dataloader, dataset_size, batch_size, num_batches = init_dataloader(batch_size=1)
 
     # Load the BERT model and tokenizer
     model = BertEmbedding()

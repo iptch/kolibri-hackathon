@@ -19,7 +19,7 @@ def init_dataloader(batch_size = 1):
     batch_size = dataloader.batch_size
     num_batches = dataset_size // batch_size
     print('\n\n\n\ndataset size', dataset_size, 'batch size', batch_size, 'number of batches', num_batches)
-    return dataloader
+    return dataloader, dataset_size, batch_size, num_batches
 
 class SearchDescriptionDataset(Dataset):
     def __init__(self, search_terms, descriptions, tokenizer, max_length=128):
