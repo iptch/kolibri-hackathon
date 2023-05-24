@@ -3,13 +3,18 @@ from torch.nn.functional import cosine_similarity
 from BertEmbedding import BertEmbedding
 import torch
 from torch import nn
-# Load the BERT model and tokenizer
-model = BertEmbedding()
-#model.load_state_dict(torch.load('overfit_bert_base_uncased.pth'))
-model.eval()
-torch.no_grad()
+import argparse
 
-def inference():
+def inference(model_path):
+
+    print('model path', model_path)
+    # Load the BERT model and tokenizer
+    model = BertEmbedding()
+    if model_path is not None:
+        model.load_state_dict(torch.load(model_path))
+    model.eval()
+    torch.no_grad()
+
     dataloader, dataset_size, batch_size, num_batches = init_dataloader(batch_size=1)
 
     # Load the BERT model and tokenizer
@@ -21,6 +26,8 @@ def inference():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
+    count_70 = 0
+    count_75 = 0
     for batch in dataloader:
         search_term, description = batch
         search_term = search_term.to(device)
@@ -42,5 +49,16 @@ def inference():
 
         print(similarity)
 
+        if similarity > 0.7 :
+            count_70 +=1
+        if similarity > 0.75:
+            count_75 +=1
+    print('similarity > 70%', count_70)
+    print('similarity > 75%', count_75)
+
 if __name__ == "__main__":
-    inference()
+    parser = argparse.ArgumentParser(description="Overfit inference, print our similarity table\n")
+    parser.add_argument("--model_path", type=str, required = False, help="The model you want to test, leave empty if you want to test the hugging face pre-trained model")
+    args = parser.parse_args()
+
+    inference(args.model_path)

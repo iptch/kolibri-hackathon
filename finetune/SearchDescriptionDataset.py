@@ -10,7 +10,7 @@ def init_dataloader(batch_size = 1):
     print(csvfiles)
 
     search_terms, content = generate_samples(csvfiles)
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased') #TODO: try the finetuned tokenizer?
 
     dataset = SearchDescriptionDataset(search_terms, content, tokenizer)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
